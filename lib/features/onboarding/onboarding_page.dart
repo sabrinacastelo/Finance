@@ -1,8 +1,10 @@
-// import 'package:finances/app.dart';
 import 'package:finances/common/constants/app_colors.dart';
+import 'package:finances/common/widgets/multi_text_button.dart';
 import 'package:finances/common/widgets/primary_button.dart';
+// import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/widgets.dart';
+
 
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key});
@@ -12,7 +14,6 @@ class OnboardingPage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          // const SizedBox(height: 50),
           Expanded(
             flex: 2,
             child: Container(
@@ -27,38 +28,42 @@ class OnboardingPage extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryColor,
               )),
-              const Text('Gaste Menos',
+          const Text('Gaste Menos',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 36,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryColor,
               )),
-              // const SizedBox(
-              //   height: 16,
-              // ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: PrimaryButton(
-                  text: 'Começar Agora', onPressed: () {
-                }),
-              ),
-              // const SizedBox(
-              //   height: 16,
-              // ),
-              const Text('Já tem uma conta? Faça login',
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: PrimaryButton(text: 'Começar Agora', onPressed: () {}),
+          ),
+          const MultiTextButton(
+            onPressed: null, 
+          children: [
+            Text('Já tem uma conta? ',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.darkGray,
+                )),
+            Text(
+              'Faça Login',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: AppColors.darkGray,
-              )),
-              const SizedBox(
-                height: 25,
-              )
+                color: AppColors.primaryColor,
+              ),
+            )
+          ]),
+          // const SizedBox(
+          //   height: 25,
+          // )
         ],
       ),
     );
   }
 }
-
