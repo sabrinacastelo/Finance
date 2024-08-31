@@ -1,10 +1,13 @@
 import 'dart:developer';
 
 import 'package:finances/common/constants/app_colors.dart';
+import 'package:finances/common/utils/validator.dart';
 import 'package:finances/common/widgets/custom_text_field.dart';
 import 'package:finances/common/widgets/multi_text_button.dart';
 import 'package:finances/common/widgets/password_form_field.dart';
 import 'package:finances/common/widgets/primary_button.dart';
+import 'package:finances/features/signup/sign_up_controller.dart';
+import 'package:finances/features/signup/sign_up_state.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -16,6 +19,51 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey();
+  final _passwordController = TextEditingController();
+  final _controller = SignUpController();
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      if (_controller.state is SignUpLoadingState) {
+        showDialog(
+            context: context,
+            builder: (context) =>
+                const Center(child: CircularProgressIndicator()));
+      }
+      if (_controller.state is SignUpSuccessState) {
+        // Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Scaffold(
+              body: Center(
+                child: Text('Logado com sucesso'),
+              ),
+            ),
+          ),
+        );
+      }
+      if (_controller.state is SignUpErrorState) {
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (context) => const SizedBox(
+            height: 150,
+            child: Text('Erro ao se cadastrar'),
+          ),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,46 +96,30 @@ class _SignUpPageState extends State<SignUpPage> {
             key: _formKey,
             child: Column(
               children: [
-                CustomTextFormField(
+                const CustomTextFormField(
                   labelText: 'Seu Nome',
                   hintText: 'JOHN DOE',
                   // inputFormatters: [UpperCaseTextInputFormatter(),],
-                  validator: (value) {
-                    if (value != null && value.isEmpty) {
-                      return 'Por favor, preencha o campo com seu nome';
-                    }
-                    return null;
-                  },
+                  validator: Validator.validateName,
                 ),
-                CustomTextFormField(
+                const CustomTextFormField(
                   labelText: 'E-mail',
                   hintText: 'johndoe@gmail.com',
-                  validator: (value) {
-                    if (value != null && value.isEmpty) {
-                      return 'Por favor, preencha o campo com seu nome';
-                    }
-                    return null;
-                  },
+                  validator: Validator.validateEmail,
                 ),
                 PasswordFormField(
+                  controller: _passwordController,
                   labelText: 'Senha',
                   hintText: '********',
-                  validator: (value) {
-                    if (value != null && value.isEmpty) {
-                      return 'Por favor, preencha o campo com seu nome';
-                    }
-                    return null;
-                  },
+                  validator: Validator.validatePassword,
+                  helperText:
+                      'A senha deve conter no mínimo 8 caracteres, contendo uma letra maiúscula e um número',
                 ),
                 PasswordFormField(
                   labelText: 'Confirme sua senha',
                   hintText: '********',
-                  validator: (value) {
-                    if (value != null && value.isEmpty) {
-                      return 'Por favor, preencha o campo com seu nome';
-                    }
-                    return null;
-                  },
+                  validator: (value) => Validator.validateConfirmPassword(
+                      value, _passwordController.text),
                 ),
               ],
             ),
@@ -97,12 +129,13 @@ class _SignUpPageState extends State<SignUpPage> {
               child: PrimaryButton(
                 text: 'Cadastrar',
                 onPressed: () {
-                final valid = _formKey.currentState != null && (_formKey.currentState as FormState).validate();
-                 if(valid){
-                    log('Valido');
-                 }else{
+                  final valid = _formKey.currentState != null &&
+                      (_formKey.currentState as FormState).validate();
+                  if (valid) {
+                    _controller.doSignUp();
+                  } else {
                     log('Invalido');
-                 }
+                  }
                 },
               )),
           const MultiTextButton(onPressed: null, children: [
