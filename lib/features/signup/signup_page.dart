@@ -2,12 +2,15 @@ import 'dart:developer';
 
 import 'package:finances/common/constants/app_colors.dart';
 import 'package:finances/common/utils/validator.dart';
+import 'package:finances/common/widgets/circular_progress.dart';
+import 'package:finances/common/widgets/custom_bottom_sheet.dart';
 import 'package:finances/common/widgets/custom_text_field.dart';
 import 'package:finances/common/widgets/multi_text_button.dart';
 import 'package:finances/common/widgets/password_form_field.dart';
 import 'package:finances/common/widgets/primary_button.dart';
 import 'package:finances/features/signup/sign_up_controller.dart';
 import 'package:finances/features/signup/sign_up_state.dart';
+import 'package:finances/services/mock_auth_service.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -20,11 +23,16 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey();
   final _passwordController = TextEditingController();
-  final _controller = SignUpController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _controller = SignUpController(MockAuthService());
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -36,7 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
         showDialog(
             context: context,
             builder: (context) =>
-                const Center(child: CircularProgressIndicator()));
+                const CircularProgress());
       }
       if (_controller.state is SignUpSuccessState) {
         // Navigator.of(context).pushReplacementNamed('/home');
@@ -53,17 +61,16 @@ class _SignUpPageState extends State<SignUpPage> {
         );
       }
       if (_controller.state is SignUpErrorState) {
+        final error = (_controller.state as SignUpErrorState);
         Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (context) => const SizedBox(
-            height: 150,
-            child: Text('Erro ao se cadastrar'),
-          ),
-        );
+        customModalBottomSheet(
+          context,
+          content: error.message,
+          button: 'Tentar novamente',);
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,13 +103,15 @@ class _SignUpPageState extends State<SignUpPage> {
             key: _formKey,
             child: Column(
               children: [
-                const CustomTextFormField(
+                CustomTextFormField(
+                  controller: _nameController,
                   labelText: 'Seu Nome',
-                  hintText: 'JOHN DOE',
+                  hintText: 'John Doe',
                   // inputFormatters: [UpperCaseTextInputFormatter(),],
                   validator: Validator.validateName,
                 ),
-                const CustomTextFormField(
+                CustomTextFormField(
+                  controller: _emailController,
                   labelText: 'E-mail',
                   hintText: 'johndoe@gmail.com',
                   validator: Validator.validateEmail,
@@ -132,7 +141,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   final valid = _formKey.currentState != null &&
                       (_formKey.currentState as FormState).validate();
                   if (valid) {
-                    _controller.doSignUp();
+                    _controller.doSignUp(
+                      name: _nameController.text,
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
                   } else {
                     log('Invalido');
                   }

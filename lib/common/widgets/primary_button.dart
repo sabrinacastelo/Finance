@@ -29,7 +29,7 @@ class PrimaryButton extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(36))
         ),
           width: 350,
-          height: 64,
+          height: 55,
           alignment: Alignment.center,
           child: Text(text,
           style: const TextStyle(
