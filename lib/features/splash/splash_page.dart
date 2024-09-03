@@ -1,6 +1,8 @@
-import 'dart:async';
 import 'package:finances/common/constants/app_colors.dart';
 import 'package:finances/common/constants/routes.dart';
+import 'package:finances/features/splash/splash_controller.dart';
+import 'package:finances/features/splash/splash_state.dart';
+import 'package:finances/locator.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -11,21 +13,27 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+
+  final _splashController = locator.get<SplashController>();
+
   @override
   void initState() {
     super.initState();
-    init();
+    _splashController.isUserLogged();
+    _splashController.addListener((){
+
+      if(_splashController.state is SuccessSplashState){
+        Navigator.pushReplacementNamed(context, NamedRoutes.homePage);
+      } else if(_splashController.state is ErrorSplashState){
+        Navigator.pushReplacementNamed(context, NamedRoutes.home);
+      }
+    });
   }
 
-  Timer init() {
-    return Timer(
-      const Duration(seconds: 2),
-      navigateToOnboarding,
-    );
-  }
-
-  void navigateToOnboarding() {
-    Navigator.pushReplacementNamed(context, NamedRoutes.home);
+@override
+  void dispose() {
+    _splashController.dispose();
+    super.dispose();
   }
 
   @override

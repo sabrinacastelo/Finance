@@ -1,5 +1,6 @@
 // import 'package:finances/common/themes/default_theme.dart';
 import 'package:finances/common/constants/routes.dart';
+import 'package:finances/features/home/home_page.dart';
 import 'package:finances/features/signin/sign_in_page.dart';
 import 'package:finances/features/signup/signup_page.dart';
 import 'package:finances/features/onboarding/onboarding_page.dart';
@@ -20,6 +21,7 @@ class App extends StatelessWidget {
         NamedRoutes.splash: (context) => const SplashPage(),
         NamedRoutes.signUp: (context) => const SignUpPage(),
         NamedRoutes.signIn: (context) => const SignInPage(),
+        NamedRoutes.homePage: (context) => const HomaPage(),
       },
     );
   }
