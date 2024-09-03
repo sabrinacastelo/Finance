@@ -4,12 +4,32 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FireBaseAuthService implements AuthService {
   final _auth = FirebaseAuth.instance;
+
   @override
   Future<UserModel> signIn({
     required String email,
     required String password,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    try {
+      final result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (result.user != null) {
+        return UserModel(
+          id: result.user!.uid,
+          email: result.user!.email,
+          name: result.user!.displayName,
+        );
+      } else {
+        throw Exception('');
+      }
+
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'nulo';
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
@@ -17,7 +37,28 @@ class FireBaseAuthService implements AuthService {
     String? name,
     required String email,
     required String password,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    try {
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (result.user != null) {
+        await result.user!.updateDisplayName(name);
+
+        return UserModel(
+          id: result.user!.uid,
+          email: result.user!.email,
+          name: result.user!.displayName,
+        );
+      } else {
+        throw Exception('');
+      }
+
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'nulo';
+    } catch (e) {
+      rethrow;
+    }
   }
 }
