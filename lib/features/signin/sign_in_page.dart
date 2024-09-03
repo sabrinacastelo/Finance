@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:finances/common/constants/app_colors.dart';
 import 'package:finances/common/constants/routes.dart';
 import 'package:finances/common/utils/validator.dart';
@@ -9,28 +8,26 @@ import 'package:finances/common/widgets/custom_text_field.dart';
 import 'package:finances/common/widgets/multi_text_button.dart';
 import 'package:finances/common/widgets/password_form_field.dart';
 import 'package:finances/common/widgets/primary_button.dart';
-import 'package:finances/features/signup/sign_up_controller.dart';
-import 'package:finances/features/signup/sign_up_state.dart';
+import 'package:finances/features/signin/sign_in_controller.dart';
+import 'package:finances/features/signin/sign_in_state.dart';
 import 'package:finances/locator.dart';
 import 'package:flutter/material.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey();
   final _passwordController = TextEditingController();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _controller = locator.get<SignUpController>();
+  final _controller = locator.get<SignInController>();
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _controller.dispose();
@@ -41,11 +38,13 @@ class _SignUpPageState extends State<SignUpPage> {
   void initState() {
     super.initState();
     _controller.addListener(() {
-      if (_controller.state is SignUpLoadingState) {
+      if (_controller.state is SignInStateLoading) {
         showDialog(
-            context: context, builder: (context) => const CircularProgress());
+            context: context,
+            builder: (context) =>
+                const CircularProgress());
       }
-      if (_controller.state is SignUpSuccessState) {
+      if (_controller.state is SignInStateSuccess) {
         // Navigator.of(context).pushReplacementNamed('/home');
         Navigator.pop(context);
         Navigator.push(
@@ -59,17 +58,17 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         );
       }
-      if (_controller.state is SignUpErrorState) {
-        final error = (_controller.state as SignUpErrorState);
+      if (_controller.state is SignInStateError) {
+        final error = (_controller.state as SignInStateError);
         Navigator.pop(context);
         customModalBottomSheet(
           context,
           content: error.message,
-          button: 'Tentar novamente',
-        );
+          button: 'Tentar novamente',);
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,15 +76,8 @@ class _SignUpPageState extends State<SignUpPage> {
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text('Economize Mais',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 36,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryColor,
-              )),
-          const Text('Gaste Menos',
+          const SizedBox(height: 20),
+          const Text('Bem Vindo de Volta',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Inter',
@@ -94,21 +86,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 color: AppColors.primaryColor,
               )),
           Image.asset(
-            'assets/images/register.png',
-            height: 200,
+            'assets/images/login.png',
+            height: 250,
           ),
           const SizedBox(height: 20),
           Form(
             key: _formKey,
             child: Column(
               children: [
-                CustomTextFormField(
-                  controller: _nameController,
-                  labelText: 'Seu Nome',
-                  hintText: 'John Doe',
-                  // inputFormatters: [UpperCaseTextInputFormatter(),],
-                  validator: Validator.validateName,
-                ),
                 CustomTextFormField(
                   controller: _emailController,
                   labelText: 'E-mail',
@@ -120,14 +105,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   labelText: 'Senha',
                   hintText: '********',
                   validator: Validator.validatePassword,
-                  helperText:
-                      'A senha deve conter no mínimo 8 caracteres, contendo uma letra maiúscula e um número',
-                ),
-                PasswordFormField(
-                  labelText: 'Confirme sua senha',
-                  hintText: '********',
-                  validator: (value) => Validator.validateConfirmPassword(
-                      value, _passwordController.text),
                 ),
               ],
             ),
@@ -135,13 +112,12 @@ class _SignUpPageState extends State<SignUpPage> {
           Padding(
               padding: const EdgeInsets.all(16.0),
               child: PrimaryButton(
-                text: 'Cadastrar',
+                text: 'Entrar',
                 onPressed: () {
                   final valid = _formKey.currentState != null &&
                       (_formKey.currentState as FormState).validate();
                   if (valid) {
-                    _controller.doSignUp(
-                      name: _nameController.text,
+                    _controller.doSignIn(
                       email: _emailController.text,
                       password: _passwordController.text,
                     );
@@ -150,29 +126,25 @@ class _SignUpPageState extends State<SignUpPage> {
                   }
                 },
               )),
-          MultiTextButton(
-              onPressed: () => Navigator.pushNamed(
-                    context,
-                    NamedRoutes.signIn,
-                  ),
-              children: const [
-                Text('Já tem uma conta? ',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.darkGray,
-                    )),
-                Text(
-                  'Faça Login',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryColor,
-                  ),
-                )
-              ]),
+          MultiTextButton(onPressed: () => Navigator.popAndPushNamed(context, NamedRoutes.signUp), 
+          children: const [
+            Text('Não tem uma conta? ',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.darkGray,
+                )),
+            Text(
+              ' Crie Agora',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primaryColor,
+              ),
+            )
+          ]),
         ],
       ),
     );

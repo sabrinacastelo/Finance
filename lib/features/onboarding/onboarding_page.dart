@@ -1,10 +1,10 @@
 import 'package:finances/common/constants/app_colors.dart';
+import 'package:finances/common/constants/routes.dart';
 import 'package:finances/common/widgets/multi_text_button.dart';
 import 'package:finances/common/widgets/primary_button.dart';
 // import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/widgets.dart';
-
 
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key});
@@ -37,11 +37,22 @@ class OnboardingPage extends StatelessWidget {
               )),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: PrimaryButton(text: 'Começar Agora', onPressed: () {}),
+            child: PrimaryButton(
+                text: 'Começar Agora',
+                onPressed: () {
+                  Navigator.pushNamed(
+                      context,
+                      NamedRoutes.signUp,
+                      );
+                }),
           ),
-          const MultiTextButton(
-            onPressed: null, 
-          children: [
+          MultiTextButton(onPressed: () =>
+            Navigator.pushNamed(
+                context,
+                NamedRoutes.signIn,
+                )
+          ,
+          children: const [
             Text('Já tem uma conta? ',
                 style: TextStyle(
                   fontFamily: 'Inter',
