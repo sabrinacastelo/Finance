@@ -2,21 +2,21 @@ import 'dart:developer';
 
 import 'package:finances/common/constants/app_colors.dart';
 import 'package:finances/common/extensions/sizes.dart';
-// import 'package:finances/services/secure_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class StatsPage extends StatefulWidget {
+  const StatsPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<StatsPage> createState() => _StatsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _StatsPageState extends State<StatsPage> {
   double get textScaleFactor =>
       MediaQuery.of(context).size.width < 360 ? 0.7 : 1.0;
   double get iconSize => MediaQuery.of(context).size.width < 360 ? 16.0 : 24.0;
-  // final _secureStorage = const SecureStorage();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,24 +49,16 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Olá, ',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    'Estatísticas de Despesas',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w700,
                     ),
-                    Text(
-                      "Hejix",
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    )
+                  ),
                   ],
                 ),
-                const SizedBox(width: 290.0),
+                const SizedBox(width: 100.0),
                 Container(
                   padding:
                       EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
@@ -103,6 +95,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Column(
                 children: [
+                  SizedBox(height: 24.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                       const Column(
                         children: [
                           Text(
-                            'Saldo Total',
+                            'Despesas Totais',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 16.0,
@@ -118,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            'R\$ 1.000,00',
+                            'R\$ 2.000,00',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 24.0,
@@ -128,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       GestureDetector(
-                        onTap: () => log('opções'),
+                        onTap: () => log('ver detalhes'),
                         child: PopupMenuButton(
                           padding: EdgeInsets.zero,
                           child: const Icon(
@@ -138,10 +131,7 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context) => [
                             const PopupMenuItem(
                               height: 24.0,
-                              child: Text('Configurações'),
-                            ),
-                            const PopupMenuItem(
-                              child: Text('Sair'),
+                              child: Text('Ver Detalhes'),
                             ),
                           ],
                         ),
@@ -149,6 +139,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   SizedBox(height: 36.h),
+                  _buildBarChart(),
+                  SizedBox(height: 24.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(16.0),
                         ),
                         child: Icon(
-                          Icons.arrow_downward,
+                          Icons.pie_chart,
                           color: AppColors.white,
                           size: iconSize,
                         ),
@@ -169,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                       const Column(
                         children: [
                           Text(
-                            'Gastos',
+                            'Maior Despesa',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 12.0,
@@ -177,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            'R\$ 467,00',
+                            'R\$ 800,00',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 16.0,
@@ -199,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(16.0),
                         ),
                         child: Icon(
-                          Icons.arrow_upward,
+                          Icons.trending_up,
                           color: AppColors.white,
                           size: iconSize,
                         ),
@@ -209,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Receita',
+                            'Menor Despesa',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 12.0,
@@ -217,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            'R\$ 1.467,00',
+                            'R\$ 50,00',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 16.0,
@@ -233,7 +225,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Positioned(
-            top: 397.h,
+            top: 597.h,
             left: 0,
             right: 0,
             bottom: 0,
@@ -245,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Transações',
+                        'Resumo',
                         style: TextStyle(
                           color: AppColors.primaryColor,
                           fontSize: 16.0,
@@ -253,9 +245,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => log('ver todos'),
+                        onTap: () => log('ver detalhes'),
                         child: const Text(
-                          'Ver todos',
+                          'Ver detalhes',
                           style: TextStyle(
                             color: AppColors.primaryColor,
                             fontSize: 12.0,
@@ -284,11 +276,11 @@ class _HomePageState extends State<HomePage> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               Column(
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Pagamento de Conta',
+                                    'Alimentação',
                                     style: TextStyle(
                                       color: Color(0xFF020000),
                                       fontSize: 16.0,
@@ -296,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    'R\$ 100,00',
+                                    'R\$ 300,00',
                                     style: TextStyle(
                                       color: Color(0xFFE92020),
                                       fontSize: 12.0,
@@ -309,7 +301,7 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'Hoje',
+                                    'Esta Semana',
                                     style: TextStyle(
                                       color: AppColors.secondaryColor,
                                       fontSize: 12.0,
@@ -317,7 +309,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    '12:00',
+                                    '15:00',
                                     style: TextStyle(
                                       color: AppColors.secondaryColor,
                                       fontSize: 12.0,
@@ -337,6 +329,169 @@ class _HomePageState extends State<HomePage> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildBarChart() {
+    return SizedBox(
+      height: 150.h,
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          barTouchData: BarTouchData(
+            touchTooltipData: BarTouchTooltipData(
+              tooltipBgColor: AppColors.primaryColor,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                String weekDay;
+                switch (group.x) {
+                  case 0:
+                    weekDay = 'Seg';
+                    break;
+                  case 1:
+                    weekDay = 'Ter';
+                    break;
+                  case 2:
+                    weekDay = 'Qua';
+                    break;
+                  case 3:
+                    weekDay = 'Qui';
+                    break;
+                  case 4:
+                    weekDay = 'Sex';
+                    break;
+                  case 5:
+                    weekDay = 'Sáb';
+                    break;
+                  case 6:
+                    weekDay = 'Dom';
+                    break;
+                  default:
+                    throw Error();
+                }
+                return BarTooltipItem(
+                  '$weekDay\n',
+                  const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'R\$ ${rod.y}',
+                      style: const TextStyle(
+                        color: Colors.yellow,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: SideTitles(
+              showTitles: true,
+              getTitles: (double value) {
+                switch (value.toInt()) {
+                  case 0:
+                    return 'S';
+                  case 1:
+                    return 'T';
+                  case 2:
+                    return 'Q';
+                  case 3:
+                    return 'Q';
+                  case 4:
+                    return 'S';
+                  case 5:
+                    return 'S';
+                  case 6:
+                    return 'D';
+                  default:
+                    return '';
+                }
+              },
+              margin: 8,
+              getTextStyles: (_, __) => const TextStyle(
+                color: AppColors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            leftTitles: SideTitles(showTitles: false),
+          ),
+          borderData: FlBorderData(
+            show: false,
+          ),
+          barGroups: [
+            BarChartGroupData(
+              x: 0,
+              barRods: [
+                BarChartRodData(
+                  y: 5,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 1,
+              barRods: [
+                BarChartRodData(
+                  y: 6,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 2,
+              barRods: [
+                BarChartRodData(
+                  y: 7,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 3,
+              barRods: [
+                BarChartRodData(
+                  y: 8,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 4,
+              barRods: [
+                BarChartRodData(
+                  y: 9,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 5,
+              barRods: [
+                BarChartRodData(
+                  y: 11,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+            BarChartGroupData(
+              x: 6,
+              barRods: [
+                BarChartRodData(
+                  y: 12,
+                  colors: [Colors.lightBlueAccent, Colors.greenAccent],
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

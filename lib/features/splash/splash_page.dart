@@ -1,5 +1,6 @@
 import 'package:finances/common/constants/app_colors.dart';
 import 'package:finances/common/constants/routes.dart';
+import 'package:finances/common/extensions/sizes.dart';
 import 'package:finances/features/splash/splash_controller.dart';
 import 'package:finances/features/splash/splash_state.dart';
 import 'package:finances/locator.dart';
@@ -19,6 +20,9 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => Sizes.init(context));
+
     _splashController.isUserLogged();
     _splashController.addListener((){
 
